@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>AWS Knowledge Wall - Project #4</title>
+        <style>
+            :root {
+                --dark-blue: #020230;
+                --gold: #ffd700;
+                --correct-green: #28a745;
+                --wrong-red: #dc3545;
+                --card-bg: rgba(255, 255, 255, 0.05);
+            }
+
+            body {
+                background-color: var(--dark-blue);
+                color: white;
+                font-family: "Segoe UI", sans-serif;
+                margin: 0;
+                padding: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+            }
+
+            h1 {
+                color: var(--gold);
+                text-transform: uppercase;
+                letter-spacing: 2px;
+                margin-bottom: 5px;
+            }
+            .subtitle {
+                margin-bottom: 30px;
+                opacity: 0.8;
+                font-style: italic;
+            }
+
+            .quiz-container {
+                width: 100%;
+                max-width: 800px;
+                display: flex;
+                flex-direction: column;
+                gap: 25px;
+            }
+
+            .question-card {
+                background: var(--card-bg);
+                border: 1px solid rgba(255, 215, 0, 0.3);
+                border-radius: 12px;
+                padding: 20px;
+                position: relative;
+            }
+
+            .question-text {
+                font-size: 1.2rem;
+                margin-bottom: 15px;
+                border-left: 4px solid var(--gold);
+                padding-left: 15px;
+            }
+
+            .options-grid {
+                display: grid;
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+                margin-bottom: 15px;
+            }
+
+            .btn {
+                background: rgba(255, 255, 255, 0.1);
+                border: 1px solid white;
+                color: white;
+                padding: 12px;
+                border-radius: 8px;
+                cursor: pointer;
+                text-align: left;
+                transition: 0.2s;
+            }
+
+            .btn:hover:not(:disabled) {
+                background: rgba(255, 215, 0, 0.1);
+                border-color: var(--gold);
+            }
+            .correct {
+                background-color: var(--correct-green) !important;
+                border-color: var(--correct-green);
+            }
+            .wrong {
+                background-color: var(--wrong-red) !important;
+                border-color: var(--wrong-red);
+            }
+
+            .card-controls {
+                text-align: right;
+            }
+            .show-btn {
+                background: transparent;
+                color: var(--gold);
+                border: 1px solid var(--gold);
+                padding: 8px 16px;
+                border-radius: 4px;
+                cursor: pointer;
+                font-size: 0.8rem;
+            }
+
+            #final-score-card {
+                margin-top: 40px;
+                padding: 30px;
+                background: var(--gold);
+                color: black;
+                border-radius: 15px;
+                text-align: center;
+                width: 100%;
+                max-width: 400px;
+                display: none; /* Hidden until finished */
+            }
+
+            .score-val {
+                font-size: 3rem;
+                font-weight: bold;
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <h1>AWS Knowledge Wall</h1>
+        <p class="subtitle">Millionaire Edition - Question Progress</p>
+
+        <div id="quiz-wall" class="quiz-container"></div>
+
+        <div id="final-score-card">
+            <h2>QUEST COMPLETE!</h2>
+            <span class="score-val" id="score-display">0/0</span>
+            <p id="rank-text">Cloud Novice</p>
+            <button
+                onclick="location.reload()"
+                style="padding: 10px 20px; cursor: pointer; font-weight: bold"
+            >
+                Restart Challenge
+            </button>
+        </div>
+
+        <script>
+            const questions = [
+                {
+                    q: "What is the term for a physical location around the world where AWS clusters multiple data centers?",
+                    options: [
+                        "AWS Outpost",
+                        "AWS Region",
+                        "AWS Edge",
+                        "AWS Local Zone",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "Which component consists of one or more discrete data centers with redundant power and networking?",
+                    options: [
+                        "Availability Zone (AZ)",
+                        "Regional Cluster",
+                        "VPC Subnet",
+                        "Global Accelerator",
+                    ],
+                    answer: 0,
+                },
+                {
+                    q: "What infrastructure component delivers content with lower latency via Amazon CloudFront?",
+                    options: [
+                        "Security Group",
+                        "Direct Connect",
+                        "Edge Location",
+                        "S3 Bucket",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "One of the 6 advantages of Cloud is trading 'Capital Expense' for what?",
+                    options: [
+                        "Fixed Expense",
+                        "Maintenance Expense",
+                        "Variable Expense",
+                        "Upfront Expense",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "Which AWS service provides resizable, virtual compute capacity in the cloud?",
+                    options: [
+                        "Amazon S3",
+                        "Amazon RDS",
+                        "Amazon EC2",
+                        "Amazon Lambda",
+                    ],
+                    answer: 2,
+                },
+            ];
+
+            let correctCount = 0;
+            let questionsAttempted = 0;
+            const wall = document.getElementById("quiz-wall");
+
+            function renderWall() {
+                questions.forEach((data, qIdx) => {
+                    const card = document.createElement("div");
+                    card.className = "question-card";
+                    card.innerHTML = `
+                <div class="question-text">${qIdx + 1}. ${data.q}</div>
+                <div class="options-grid" id="options-${qIdx}">
+                    ${data.options
+                        .map(
+                            (opt, i) => `
+                        <button class="btn" onclick="checkAnswer(${qIdx}, ${i}, this)">
+                            ${String.fromCharCode(65 + i)}: ${opt}
+                        </button>
+                    `
+                        )
+                        .join("")}
+                </div>
+                <div class="card-controls" id="controls-${qIdx}">
+                    <button class="show-btn" onclick="revealAnswer(${qIdx})">Show Answer</button>
+                </div>
+            `;
+                    wall.appendChild(card);
+                });
+            }
+
+            function checkAnswer(qIdx, choiceIdx, btn) {
+                const correctIdx = questions[qIdx].answer;
+                const options = document.getElementById(
+                    `options-${qIdx}`
+                ).children;
+                const controls = document.getElementById(`controls-${qIdx}`);
+
+                Array.from(options).forEach((b) => (b.disabled = true));
+                controls.style.display = "none";
+
+                if (choiceIdx === correctIdx) {
+                    btn.classList.add("correct");
+                    correctCount++;
+                } else {
+                    btn.classList.add("wrong");
+                    options[correctIdx].classList.add("correct");
+                }
+
+                trackProgress();
+            }
+
+            function revealAnswer(qIdx) {
+                const correctIdx = questions[qIdx].answer;
+                const options = document.getElementById(
+                    `options-${qIdx}`
+                ).children;
+                const controls = document.getElementById(`controls-${qIdx}`);
+
+                Array.from(options).forEach((b) => (b.disabled = true));
+                options[correctIdx].classList.add("correct");
+                controls.style.display = "none";
+
+                trackProgress();
+            }
+
+            function trackProgress() {
+                questionsAttempted++;
+                if (questionsAttempted === questions.length) {
+                    showFinalScore();
+                }
+            }
+
+            function showFinalScore() {
+                const card = document.getElementById("final-score-card");
+                const display = document.getElementById("score-display");
+                const rank = document.getElementById("rank-text");
+
+                card.style.display = "block";
+                display.textContent = `${correctCount}/${questions.length}`;
+
+                if (correctCount === questions.length)
+                    rank.textContent = "AWS Certified Master!";
+                else if (correctCount >= 3)
+                    rank.textContent = "Cloud Practitioner Pro";
+                else rank.textContent = "Keep Studying!";
+
+                card.scrollIntoView({ behavior: "smooth" });
+            }
+
+            renderWall();
+        </script>
+    </body>
+</html>
