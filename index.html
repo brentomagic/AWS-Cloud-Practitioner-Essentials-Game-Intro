@@ -304,7 +304,6 @@
                 ).children;
 
                 let wrongIndices = [0, 1, 2, 3].filter((i) => i !== correctIdx);
-                // Randomly pick 2 wrong indices to remove
                 wrongIndices.sort(() => Math.random() - 0.5);
                 const toHide = wrongIndices.slice(0, 2);
 
@@ -313,7 +312,7 @@
                     options[i].disabled = true;
                 });
 
-                lifelineBtn.disabled = true; // Lifeline can only be used once per card
+                lifelineBtn.disabled = true;
             }
 
             function checkAnswer(qIdx, choiceIdx, btn) {
