@@ -37,6 +37,7 @@
                 color: var(--gold);
                 margin-top: 0;
             }
+
             .visual-mockup {
                 background: #000;
                 border: 2px dashed var(--gold);
@@ -103,6 +104,7 @@
                 background: rgba(255, 215, 0, 0.1);
                 border-color: var(--gold);
             }
+
             .correct {
                 background-color: var(--correct-green) !important;
                 border-color: var(--correct-green);
@@ -112,10 +114,18 @@
                 border-color: var(--wrong-red);
             }
 
-            .card-controls {
-                text-align: right;
+            .hidden-option {
+                opacity: 0;
+                pointer-events: none;
             }
-            .show-btn {
+
+            .card-controls {
+                display: flex;
+                justify-content: flex-end;
+                gap: 10px;
+            }
+
+            .lifeline-btn {
                 background: transparent;
                 color: var(--gold);
                 border: 1px solid var(--gold);
@@ -123,6 +133,12 @@
                 border-radius: 4px;
                 cursor: pointer;
                 font-size: 0.8rem;
+                font-weight: bold;
+            }
+
+            .lifeline-btn:disabled {
+                opacity: 0.3;
+                cursor: not-allowed;
             }
 
             #final-score-card {
@@ -145,30 +161,33 @@
         </style>
     </head>
     <body>
+        <h1>AWS Knowledge Wall</h1>
+        <p class="subtitle">
+            Millionaire Edition - Created by Nwabueze Brent Ugoh
+        </p>
         <div class="doc-section">
             <h2>Project Documentation</h2>
             <p>
                 <strong>Game Description:</strong> The AWS Knowledge Wall is a
-                "Millionaire Edition" study tool that presents all core
-                infrastructure questions simultaneously. It is designed to
-                prepare students for the AWS Cloud Practitioner exam through
-                active recall and immediate feedback.
+                "Millionaire Edition" study tool that presents core
+                infrastructure questions simultaneously. It provides lifelines
+                like "50/50" and "Show Answer" to assist in learning.
             </p>
 
             <p><strong>Gameplay Instructions:</strong></p>
             <ul>
                 <li>Select the best answer for each question card.</li>
                 <li>
-                    Correct choices turn green; incorrect choices turn red and
-                    reveals the right answer.
+                    <strong>50/50 Lifeline:</strong> Removes two incorrect
+                    answers from the current card.
                 </li>
                 <li>
-                    Use "Show Answer" as a lifeline to see the correct choice
-                    instantly.
+                    <strong>Show Answer:</strong> Instantly highlights the
+                    correct choice.
                 </li>
+                <li>Correct choices turn green; incorrect choices turn red.</li>
                 <li>
-                    Complete all questions to view your final rank at the
-                    bottom.
+                    Complete all questions to view your final score and rank.
                 </li>
             </ul>
 
@@ -178,12 +197,9 @@
                 -------------------<br />
                 A: Option 1 | B: Option 2<br />
                 C: Option 3 | D: Option 4<br />
-                [REVEAL BUTTON]
+                [50/50] [SHOW ANSWER]
             </div>
         </div>
-
-        <h1>AWS Knowledge Wall</h1>
-        <p class="subtitle">Millionaire Edition - Question Progress</p>
 
         <div id="quiz-wall" class="quiz-container"></div>
 
@@ -274,10 +290,30 @@
                         .join("")}
                 </div>
                 <div class="card-controls" id="controls-${qIdx}">
-                    <button class="show-btn" onclick="revealAnswer(${qIdx})">Show Answer</button>
+                    <button class="lifeline-btn" onclick="useFiftyFifty(${qIdx}, this)">50/50</button>
+                    <button class="lifeline-btn" onclick="revealAnswer(${qIdx})">Show Answer</button>
                 </div>`;
                     wall.appendChild(card);
                 });
+            }
+
+            function useFiftyFifty(qIdx, lifelineBtn) {
+                const correctIdx = questions[qIdx].answer;
+                const options = document.getElementById(
+                    `options-${qIdx}`
+                ).children;
+
+                let wrongIndices = [0, 1, 2, 3].filter((i) => i !== correctIdx);
+                // Randomly pick 2 wrong indices to remove
+                wrongIndices.sort(() => Math.random() - 0.5);
+                const toHide = wrongIndices.slice(0, 2);
+
+                toHide.forEach((i) => {
+                    options[i].classList.add("hidden-option");
+                    options[i].disabled = true;
+                });
+
+                lifelineBtn.disabled = true; // Lifeline can only be used once per card
             }
 
             function checkAnswer(qIdx, choiceIdx, btn) {
@@ -286,8 +322,10 @@
                     `options-${qIdx}`
                 ).children;
                 const controls = document.getElementById(`controls-${qIdx}`);
+
                 Array.from(options).forEach((b) => (b.disabled = true));
                 controls.style.display = "none";
+
                 if (choiceIdx === correctIdx) {
                     btn.classList.add("correct");
                     correctCount++;
@@ -304,6 +342,7 @@
                     `options-${qIdx}`
                 ).children;
                 const controls = document.getElementById(`controls-${qIdx}`);
+
                 Array.from(options).forEach((b) => (b.disabled = true));
                 options[correctIdx].classList.add("correct");
                 controls.style.display = "none";
@@ -321,11 +360,13 @@
                 const rank = document.getElementById("rank-text");
                 card.style.display = "block";
                 display.textContent = `${correctCount}/${questions.length}`;
+
                 if (correctCount === questions.length)
                     rank.textContent = "AWS Certified Master!";
                 else if (correctCount >= 3)
                     rank.textContent = "Cloud Practitioner Pro";
                 else rank.textContent = "Keep Studying!";
+
                 card.scrollIntoView({ behavior: "smooth" });
             }
 
