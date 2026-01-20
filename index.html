@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
     <head>
         <meta charset="UTF-8" />
@@ -190,15 +190,6 @@
                     Complete all questions to view your final score and rank.
                 </li>
             </ul>
-
-            <p><strong>Visual Concept:</strong></p>
-            <div class="visual-mockup">
-                [AWS QUESTION CARD]<br />
-                -------------------<br />
-                A: Option 1 | B: Option 2<br />
-                C: Option 3 | D: Option 4<br />
-                [50/50] [SHOW ANSWER]
-            </div>
         </div>
 
         <div id="quiz-wall" class="quiz-container"></div>
@@ -217,6 +208,7 @@
 
         <script>
             const questions = [
+                // Original Questions
                 {
                     q: "What is the term for a physical location around the world where AWS clusters multiple data centers?",
                     options: [
@@ -367,6 +359,102 @@
                     ],
                     answer: 2,
                 },
+                // Week 3 New Questions
+                {
+                    q: "Which pricing model allows you to pay for compute capacity with no long-term commitments?",
+                    options: [
+                        "Spot Instances",
+                        "Reserved Instances",
+                        "On-Demand",
+                        "Dedicated Hosts",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "What tool allows you to estimate the cost of your use cases before you build them on AWS?",
+                    options: [
+                        "Cost Explorer",
+                        "AWS Pricing Calculator",
+                        "AWS Budgets",
+                        "Trusted Advisor",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "In the Shared Responsibility Model, who is responsible for the physical security of data centers?",
+                    options: [
+                        "The Customer",
+                        "AWS",
+                        "Both AWS and Customer",
+                        "Third-party auditors",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "Which tool helps you visualize and manage your AWS costs and usage over time?",
+                    options: [
+                        "AWS Cost Explorer",
+                        "Amazon Inspector",
+                        "AWS Shield",
+                        "AWS Artifact",
+                    ],
+                    answer: 0,
+                },
+                {
+                    q: "What software layer allows multiple virtual machines to run on a single physical host?",
+                    options: ["Container", "AMI", "Hypervisor", "VPC"],
+                    answer: 2,
+                },
+                {
+                    q: "Which is a key best practice for the AWS Root user account?",
+                    options: [
+                        "Share credentials with admins",
+                        "Enable MFA and stop using the root user",
+                        "Use it for daily tasks",
+                        "Delete the account",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "What provides the information required to launch an instance, such as the OS and software?",
+                    options: [
+                        "Security Group",
+                        "Amazon Machine Image (AMI)",
+                        "VPC",
+                        "Elastic IP",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "Which AWS pricing model is best suited for steady-state workloads with predictable usage?",
+                    options: [
+                        "On-Demand",
+                        "Spot Instances",
+                        "Reserved Instances",
+                        "Pay-as-you-go",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "What is a logically isolated section of the AWS Cloud where you can launch resources?",
+                    options: [
+                        "Subnet",
+                        "Edge Location",
+                        "Virtual Private Cloud (VPC)",
+                        "Availability Zone",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "Under the Shared Responsibility Model, which of these is the customer's responsibility?",
+                    options: [
+                        "Global Infrastructure",
+                        "Physical Power",
+                        "Client-side Data Encryption",
+                        "Edge Locations",
+                    ],
+                    answer: 2,
+                },
             ];
 
             let correctCount = 0;
@@ -384,8 +472,8 @@
                         .map(
                             (opt, i) =>
                                 `<button class="btn" onclick="checkAnswer(${qIdx}, ${i}, this)">${String.fromCharCode(
-                                    65 + i
-                                )}: ${opt}</button>`
+                                    65 + i,
+                                )}: ${opt}</button>`,
                         )
                         .join("")}
                 </div>
@@ -400,31 +488,26 @@
             function useFiftyFifty(qIdx, lifelineBtn) {
                 const correctIdx = questions[qIdx].answer;
                 const options = document.getElementById(
-                    `options-${qIdx}`
+                    `options-${qIdx}`,
                 ).children;
-
                 let wrongIndices = [0, 1, 2, 3].filter((i) => i !== correctIdx);
                 wrongIndices.sort(() => Math.random() - 0.5);
                 const toHide = wrongIndices.slice(0, 2);
-
                 toHide.forEach((i) => {
                     options[i].classList.add("hidden-option");
                     options[i].disabled = true;
                 });
-
                 lifelineBtn.disabled = true;
             }
 
             function checkAnswer(qIdx, choiceIdx, btn) {
                 const correctIdx = questions[qIdx].answer;
                 const options = document.getElementById(
-                    `options-${qIdx}`
+                    `options-${qIdx}`,
                 ).children;
                 const controls = document.getElementById(`controls-${qIdx}`);
-
                 Array.from(options).forEach((b) => (b.disabled = true));
                 controls.style.display = "none";
-
                 if (choiceIdx === correctIdx) {
                     btn.classList.add("correct");
                     correctCount++;
@@ -438,10 +521,9 @@
             function revealAnswer(qIdx) {
                 const correctIdx = questions[qIdx].answer;
                 const options = document.getElementById(
-                    `options-${qIdx}`
+                    `options-${qIdx}`,
                 ).children;
                 const controls = document.getElementById(`controls-${qIdx}`);
-
                 Array.from(options).forEach((b) => (b.disabled = true));
                 options[correctIdx].classList.add("correct");
                 controls.style.display = "none";
@@ -459,13 +541,13 @@
                 const rank = document.getElementById("rank-text");
                 card.style.display = "block";
                 display.textContent = `${correctCount}/${questions.length}`;
-
                 if (correctCount === questions.length)
                     rank.textContent = "AWS Certified Master!";
-                else if (correctCount >= 3)
+                else if (correctCount >= 20)
                     rank.textContent = "Cloud Practitioner Pro";
+                else if (correctCount >= 10)
+                    rank.textContent = "Rising Architect";
                 else rank.textContent = "Keep Studying!";
-
                 card.scrollIntoView({ behavior: "smooth" });
             }
 
