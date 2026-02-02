@@ -455,13 +455,114 @@
                     ],
                     answer: 2,
                 },
+                // Week 4 New Questions - Cloud Security & Compliance
+                {
+                    q: "Which AWS service provides real-time threat detection and monitoring for your AWS account and workloads?",
+                    options: [
+                        "AWS Artifact",
+                        "Amazon GuardDuty",
+                        "AWS WAF",
+                        "AWS Shield Standard",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "What is the primary purpose of AWS Artifact?",
+                    options: [
+                        "Store large video files",
+                        "Provide compliance documentation and certifications",
+                        "Monitor database performance",
+                        "Manage EC2 instances",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "Which AWS service helps protect web applications from common web exploits like SQL injection and DDoS attacks?",
+                    options: [
+                        "Amazon GuardDuty",
+                        "AWS Shield Standard",
+                        "AWS Web Application Firewall (WAF)",
+                        "Network ACL",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "What does IAM stand for in AWS?",
+                    options: [
+                        "Internet Access Management",
+                        "Identity and Access Management",
+                        "Infrastructure & Administration Module",
+                        "Integrated Application Manager",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "Which AWS service manages encryption keys and controls their use across your AWS services?",
+                    options: [
+                        "AWS Artifact",
+                        "Amazon GuardDuty",
+                        "AWS Key Management Service (KMS)",
+                        "AWS CloudTrail",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "What is AWS Shield Standard designed to protect against?",
+                    options: [
+                        "DDoS attacks of any size",
+                        "Common DDoS attacks at no extra cost",
+                        "SQL injection attacks only",
+                        "Unauthorized IAM access",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "Which feature should be enabled on the AWS root account for enhanced security?",
+                    options: [
+                        "API keys only",
+                        "SSH keys",
+                        "Multi-Factor Authentication (MFA)",
+                        "Access keys",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "Which AWS service allows employees to use existing corporate credentials to access AWS resources?",
+                    options: [
+                        "Amazon GuardDuty",
+                        "AWS Artifact",
+                        "AWS Single Sign-On (SSO)",
+                        "AWS WAF",
+                    ],
+                    answer: 2,
+                },
+                {
+                    q: "What is the primary use case for Amazon Cognito?",
+                    options: [
+                        "Encrypt data at rest",
+                        "User authentication and authorization for web and mobile applications",
+                        "Monitor DDoS attacks",
+                        "Manage EC2 security groups",
+                    ],
+                    answer: 1,
+                },
+                {
+                    q: "At which level do Network Access Control Lists (NACLs) operate?",
+                    options: [
+                        "Instance level",
+                        "Subnet level",
+                        "Region level",
+                        "VPC level only",
+                    ],
+                    answer: 1,
+                },
             ];
 
-            let correctCount = 0;
-            let questionsAttempted = 0;
-            const wall = document.getElementById("quiz-wall");
-
             function renderWall() {
+                const wall = document.getElementById("quiz-wall");
+                let correctCount = 0;
+                let questionsAttempted = 0;
+
                 questions.forEach((data, qIdx) => {
                     const card = document.createElement("div");
                     card.className = "question-card";
