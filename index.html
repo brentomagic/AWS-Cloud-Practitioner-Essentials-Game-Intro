@@ -558,10 +558,11 @@
                 },
             ];
 
+            let correctCount = 0;
+            let questionsAttempted = 0;
+
             function renderWall() {
                 const wall = document.getElementById("quiz-wall");
-                let correctCount = 0;
-                let questionsAttempted = 0;
 
                 questions.forEach((data, qIdx) => {
                     const card = document.createElement("div");
